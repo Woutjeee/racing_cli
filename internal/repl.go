@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"regexp"
 	"strings"
@@ -24,7 +23,7 @@ func cleanInput(text string) (string, map[string]string, error) {
 	parts := strings.Fields(output)
 
 	if output == "" {
-		return "", nil, errors.New("Nothing was typed in, please enter a command.")
+		return "", nil, errors.New("Nothing was typed in, please enter a command. Enter the command 'help' to get information about the app.")
 	}
 
 	commandName := parts[0]
@@ -48,12 +47,13 @@ func StartReplLoop(cfg *configuration.Config) {
 	commands := GetCommands(cfg)
 
 	reader := bufio.NewScanner(os.Stdin)
+	intro()
 	printRepl()
 	for reader.Scan() {
 		text, flags, err := cleanInput(reader.Text())
 
 		if err != nil {
-			log.Print(err)
+			fmt.Println(err)
 			printRepl()
 		} else {
 			if command, exists := commands[text]; exists {
@@ -71,4 +71,21 @@ func StartReplLoop(cfg *configuration.Config) {
 			printRepl()
 		}
 	}
+}
+
+func intro() {
+	fmt.Println(`
+_______  ________  ________  ___  ________   ________          ________  ___       ___     
+|\   __  \|\   __  \|\   ____\|\  \|\   ___  \|\   ____\        |\   ____\|\  \     |\  \    
+\ \  \|\  \ \  \|\  \ \  \___|\ \  \ \  \\ \  \ \  \___|        \ \  \___|\ \  \    \ \  \   
+ \ \   _  _\ \   __  \ \  \    \ \  \ \  \\ \  \ \  \  ___       \ \  \    \ \  \    \ \  \  
+  \ \  \\  \\ \  \ \  \ \  \____\ \  \ \  \\ \  \ \  \|\  \       \ \  \____\ \  \____\ \  \ 
+   \ \__\\ _\\ \__\ \__\ \_______\ \__\ \__\\ \__\ \_______\       \ \_______\ \_______\ \__\
+    \|__|\|__|\|__|\|__|\|_______|\|__|\|__| \|__|\|_______|        \|_______|\|_______|\|__|`)
+	fmt.Println("Welcome to the Racing CLI, here you can find the latest race results!")
+	fmt.Println(`
+We currently support te following racing sports
+	- Formula 1`)
+	fmt.Println("To get started, enter the name of the sport you want to get results from.")
+	fmt.Println("NOTE: If a sport has number in it, for example 'Formula 1' enter it as follows: FormulaOne")
 }
